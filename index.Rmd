@@ -56,9 +56,8 @@ p <- ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+
     title = "Casos nuevos covid") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
-ggplotly(p)
 
-ggplotly(p) %>% htmlwidgets::saveWidget(file = "plot.html")
+htmlwidgets::saveWidget(ggplotly(p), file = "plot.html")
 ```
 Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
 
