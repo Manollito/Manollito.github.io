@@ -89,11 +89,7 @@ covid_edad <- covid %>%
                cols = c('Menores fallecidos',  'Adultos fallecidos',	'Adultos mayores fallecidos')
 ) %>%
   filter(!is.na(value))
-<<<<<<< Updated upstream
-covid_edad
-=======
 
->>>>>>> Stashed changes
 ```
 
 ```{r}
@@ -122,11 +118,6 @@ covid_muertos <- covid %>%
                cols = c('hombres fallecidos',  'mujeres fallecidas')
 ) %>%
   filter(!is.na(value), value>=0)
-<<<<<<< Updated upstream
-covid_muertos
-=======
-
->>>>>>> Stashed changes
 ```
 
 ```{r}
@@ -179,6 +170,3 @@ barplot(height = datos_grafico_2021$casos_totales,
         xlab = "Provincia",
         ylab = "Casos totales de COVID")
 ```
-
-=======
->>>>>>> Stashed changes
