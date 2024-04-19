@@ -1,17 +1,11 @@
 ---
-title: "My Website"
+title: "Visualización de información sobre el covid"
 ---
 
-**Estudiante:** Harlen Daniel Quirós Gómez
-
-**Carnet:** 2022082503
-
-**Estudiante:** Manuel de Jesús Calero Ríos
-
-**Carnet:** 2022082503
+**Autores:** Manuel de Jesús Calero Ríos y Harlen Daniel Quirós Gómez
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library (ggplot2)
 library(dplyr)
 library(readxl)
@@ -31,8 +25,8 @@ covid_provincias <- covid_provincias %>%
   mutate(anio = year(fecha)) %>%
   filter( provincia != 'Otros')
 ```
-
-```{r echo=FALSE}
+# Gráficas unidimensionales 
+```{r}
 covid_no_acumulado <- covid %>%
   mutate(
     anterior_dia_hombre = lag(hom_posi),
@@ -44,38 +38,44 @@ covid_no_acumulado <- covid %>%
 ```
 
 ```{r}
-p <- ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100 , fill = "red")+ 
   labs(
     x = "Cantidad de casos de covid", 
+    y = "Cantidad de dias", 
     title = "Casos nuevos covid") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
 ggplotly(p)
 ```
 
-Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
+En las gráfica anterior se puede observar que la mayoría de días hubo muy pocos casos activos nuevos, y el dia que hubo aproximadamente 7000 casos fue solo uno. Esto da como indicio que el covid se fue esparciendo poco a poco y que muy pocos días hubo picos altos de contagio, causando así que el virus se mantuviera controlado.
 
 ```{r}
-p <- ggplot(covid_no_acumulado, aes(muj_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid_no_acumulado, aes(muj_posi_no_acumulado)) + geom_histogram(binwidth=100, fill = "#F33A6A")+ 
   labs(
     x = "Cantidad casos de covid: Mujeres", 
+    y = "Cantidad de dias", 
     title = "Casos nuevos de covid en mujeres") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
 ggplotly(p)
 ```
+En la gráfica anterior se observa de igual manera que hubo muchos días donde hubo nuevos contagios de mujeres con covid, sí hubo picos de casos, pero fueron muy pocos días, por lo que el covid en los hombres no se vio muy disparado y siempre fue creciendo de manera uniforme.
 
 ```{r}
-p <- ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(binwidth=100, fill = "blue")+ 
   labs(
     x = "Cantidad casos de covid: Hombres", 
+    y = "Cantidad de dias", 
     title = "Casos nuevos de covid en hombres") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
 ggplotly(p)
 ```
 
-Hacer reseña entre las diferencias y que nunca hubo tantos hombres positivos como mujeres en un solo dia.
+En la gráfica anterior se observa de igual manera que hubo muchos días donde hubo nuevos contagios de mujeres con covid, sí hubo picos de casos, pero fueron muy pocos días, por lo que el covid en los hombres no se vio muy disparado y siempre fue creciendo de manera uniforme. En comparación con las mujeres, estas tienen el pico más alto de nuevos contagios de covid, con casi 4000, mientras el dia en pico más alto de hombres fue de casi 3400.
+
+# Gráficas bidimensionales
 
 ```{r}
 covid_edad <- covid %>%
@@ -96,18 +96,18 @@ covid_edad <- covid %>%
 ```
 
 ```{r}
-p <- ggplot(covid_edad, aes(edad, value)) + geom_violin() + 
+p <- ggplot(covid_edad, aes(edad, value)) + geom_violin(fill = "green") + 
   labs(
     x = "Categoria de edad", 
     y = "Cantidad de casos", 
-    title = "Cantidad de casos por categoría de edad"
+    title = "Cantidad de casos fallecidos por categoría de edad"
   ) +
   scale_y_continuous(breaks=seq( 0, max(covid_edad$value), by=500) ) +
   theme_classic()
 ggplotly(p)
 ```
 
-Hacer reseña hubieron muchos días con pocos casos en niños y adultos mayores, pero con los adultos tuvieron días con muchos más casos, estos fueron pocos días, por eso la gráfica se ve tan punteada.
+Hubo muchos dias con pocas muertes en niños y adultos mayores, pero los adultos tuvieron días con muchos más muertes, aunque estos fueron pocos, por eso la gráfica se ve tan punteada. En los adultos hubo más dias con pocos muertos, por eso se ve tan ancha en la base, en los niños si hubo días con más muertos, aunque esto se ve uniforme.
 
 ```{r}
 covid_muertos <- covid %>%
@@ -139,14 +139,18 @@ ggplotly(p)
 En ambos gráficos se puede ver que hay días donde levemente hubo más hombres fallecidos que mujeres. Hubieron días que no hubo muertes. La caja de los hombres se observa un poco más larga, lo que quiere decir que la dispersión de cantidad de fallecidos por día es mayor en los hombres.
 
 ```{r}
-p <- ggplot(covid_provincias, aes(fecha, casos)) + 
+p <- ggplot(covid_provincias, aes(fecha, casos, color = as.factor(anio))) + 
   geom_line() + 
+  labs(
+    x = ""
+  )+
   facet_grid(provincia ~ anio, scales = "free_x")+
-  theme_minimal()
+  theme_minimal() +
+  scale_color_manual(values = c("2020" = "red", "2021" = "blue", "2022" = "green"))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 ggplotly(p)
 ```
-
-Hacer reseña de que san josé tiene muchos picos en más años comparados con las otras provincias, de igual manera en Alajuela
+En la gráfica anterior se observa como la provincia con mayor cntidad de picos es San José, especialmente en el año 2022, que es el año donde se ve más pronunciado. Limón, Puntarenas y Guanacaste son las provincias con la menor cantidad de casos, estos no tuvieron picos y la propagación fue muy uniforme.El comportamiento de Alajuela es más pronunciado en el 2021 y 2022, por lo que al principio de la pandemia hubo menos casos y conforme fue avanzando se dieron más. Cartago y Heredia son provincias donde este compórtamiento estuvo muy parecido, tienen picos, pero no muy extensos, y se ve muy uniforme la propagación. Las provincias costeras se dieron menos casos, pero en GAM hubo más, por lo que se puede dar una relación bastante curiosa.
 
 ```{r}
 
