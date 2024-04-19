@@ -11,17 +11,21 @@ title: "My Website"
 **Carnet:** 2022082503
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library (ggplot2)
 library(dplyr)
 library(readxl)
 library(plotly)
 library(tidyr)
 library(lubridate)
+library(gghighlight)
+library(patchwork)
 
 covid <- read_excel("CasosCOVID.xlsx", sheet = "1_GENERAL")
 covid_provincias <- read_excel("CasosCOVID.xlsx", sheet = "2_4 CANT_ACTIVOS")
 covid2 <- read_excel("CasosCOVID.xlsx", sheet = "2_5 CANT_NUEVOS")
+covidRecuperados <- read_excel("CasosCOVID.xlsx", sheet = "2_2 CANT_RECUPERADOS")
+covidFallecidos <- read_excel("CasosCOVID.xlsx", sheet = "2_3 CANT_FALLECIDOS")
 covid_provincias <- covid_provincias %>%
   pivot_longer(names_to='fecha',
                cols = starts_with("4")) %>%
@@ -30,6 +34,30 @@ covid_provincias <- covid_provincias %>%
   summarise(casos = sum(value)) %>%
   mutate(anio = year(fecha)) %>%
   filter( provincia != 'Otros')
+covid2 <- covid2 %>%
+  pivot_longer(names_to='fecha',
+               cols = starts_with("4")) %>%
+  mutate(fecha = as.Date(as.numeric(fecha), origin = "1900-01-01" )) %>%
+  group_by(provincia, fecha) %>%
+  summarise(casos = sum(value)) %>%
+  mutate(anio = year(fecha)) %>%
+  filter( provincia != 'Otros')
+covidRecuperados <- covidRecuperados %>%
+  pivot_longer(names_to='fecha',
+               cols = starts_with("4")) %>%
+  mutate(fecha = as.Date(as.numeric(fecha), origin = "1900-01-01" )) %>%
+  group_by(provincia, fecha) %>%
+  summarise(casos = sum(value)) %>%
+  mutate(anio = year(fecha)) %>%
+  filter( provincia != 'Otros', anio == 2021)
+covidFallecidos <- covidFallecidos %>%
+  pivot_longer(names_to='fecha',
+               cols = starts_with("4")) %>%
+  mutate(fecha = as.Date(as.numeric(fecha), origin = "1900-01-01" )) %>%
+  group_by(provincia, fecha) %>%
+  summarise(casos = sum(value)) %>%
+  mutate(anio = year(fecha)) %>%
+  filter( provincia != 'Otros', anio == 2021)
 ```
 
 ```{r echo=FALSE}
@@ -53,7 +81,7 @@ p <- ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+
 ggplotly(p)
 ```
 
-Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
+- Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
 
 ```{r}
 p <- ggplot(covid_no_acumulado, aes(muj_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
@@ -75,7 +103,7 @@ p <- ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(bi
 ggplotly(p)
 ```
 
-Hacer reseña entre las diferencias y que nunca hubo tantos hombres positivos como mujeres en un solo dia.
+- Hacer reseña entre las diferencias y que nunca hubo tantos hombres positivos como mujeres en un solo dia.
 
 ```{r}
 covid_edad <- covid %>%
@@ -107,7 +135,7 @@ p <- ggplot(covid_edad, aes(edad, value)) + geom_violin() +
 ggplotly(p)
 ```
 
-Hacer reseña hubieron muchos días con pocos casos en niños y adultos mayores, pero con los adultos tuvieron días con muchos más casos, estos fueron pocos días, por eso la gráfica se ve tan punteada.
+- Hacer reseña hubieron muchos días con pocos casos en niños y adultos mayores, pero con los adultos tuvieron días con muchos más casos, estos fueron pocos días, por eso la gráfica se ve tan punteada.
 
 ```{r}
 covid_muertos <- covid %>%
@@ -136,7 +164,7 @@ p <- ggplot(covid_muertos, aes(fallecidos, value)) + geom_boxplot() +
 ggplotly(p)
 ```
 
-En ambos gráficos se puede ver que hay días donde levemente hubo más hombres fallecidos que mujeres. Hubieron días que no hubo muertes. La caja de los hombres se observa un poco más larga, lo que quiere decir que la dispersión de cantidad de fallecidos por día es mayor en los hombres.
+- En ambos gráficos se puede ver que hay días donde levemente hubo más hombres fallecidos que mujeres. Hubieron días que no hubo muertes. La caja de los hombres se observa un poco más larga, lo que quiere decir que la dispersión de cantidad de fallecidos por día es mayor en los hombres.
 
 ```{r}
 p <- ggplot(covid_provincias, aes(fecha, casos)) + 
@@ -146,7 +174,7 @@ p <- ggplot(covid_provincias, aes(fecha, casos)) +
 ggplotly(p)
 ```
 
-Hacer reseña de que san josé tiene muchos picos en más años comparados con las otras provincias, de igual manera en Alajuela
+- Hacer reseña de que san josé tiene muchos picos en más años comparados con las otras provincias, de igual manera en Alajuela
 
 ```{r}
 
@@ -156,22 +184,50 @@ Hacer reseña de que san josé tiene muchos picos en más años comparados con l
 
 ```{r}
 covid_2021 <- covid2 %>%
-  select(cod_provin, provincia, cod_canton, canton, starts_with("2021"))
-head(covid2)
-# Suma de casos totales por provincia
-casos_totales_2021 <- rowSums(covid_2021[, -(1:4)])
+  filter(anio == 2021)
 
-# Crear un dataframe con las provincias y sus casos totales
-datos_grafico_2021 <- data.frame(provincia = covid_2021$provincia, casos_totales = casos_totales_2021)
+covid_top5 <- covid_2021 %>%
+  filter(provincia %in% (covid_2021 %>%
+  group_by(provincia) %>%
+  summarise(total_casos = sum(casos)) %>%
+  arrange(desc(total_casos))%>%
+  slice(1:5))$provincia)
 
-# Ordenar los datos de mayor a menor según los casos totales
-datos_grafico_2021 <- datos_grafico_2021[order(-datos_grafico_2021$casos_totales), ]
-
-# Crear el gráfico de barras
-barplot(height = datos_grafico_2021$casos_totales,
-        names.arg = datos_grafico_2021$provincia,
-        las = 2,  # Orientación de etiquetas en el eje x
-        main = "Casos totales de COVID por provincia en 2021",
-        xlab = "Provincia",
-        ylab = "Casos totales de COVID")
+p <- ggplot(covid_top5, aes(fecha, casos, color = provincia)) +
+  geom_point() +
+  gghighlight(max(casos)) +
+  facet_wrap(vars(provincia)) +
+  labs(title = "Top 5 Provincias con más casos de COVID-19 activo en 2021",
+       x = "Fecha",
+       y = "Casos",
+       color = "Provincia") +
+  theme_minimal()
+ggplotly(p)
 ```
+
+- En este caso para mostrar la gráfica multidimensional se utilizó la técnica de puntos, pero con el detalle de separar los casos en colores combinando con tonos grises para así poder distinguir los datos. Gracias a ello se comprueba que San José y Alajuela tuvieron la mayor cantidad de casos activos durante el año 2021, además que provincias como Cartago, Hereria y Puntarenas tuvieron un ritmo bajo de casos activos, sin decir que tuvieron el mismo.
+
+# Gráfica compuesta
+
+```{r}
+p_recuperados <- ggplot(covidRecuperados, aes(fecha, casos, fill = provincia)) +
+  geom_bar(stat = "identity") +  
+  facet_wrap(vars(provincia)) +
+  labs(title = "Recuperados por provincia en 2021",
+       x = "Fecha",
+       y = "Recuperados",
+       fill = "Provincia")
+
+
+p_fallecidos <- ggplot(covidFallecidos, aes(fecha, casos, color = provincia)) +
+  geom_point() +
+  facet_wrap(vars(provincia)) +
+  labs(title = "Fallecidos por provincia en 2021",
+       x = "Fecha",
+       y = "Fallecidos",
+       color = "Provincia")
+p_recuperados + p_fallecidos
+
+```
+
+- En dicha gráfica compuesta se observa que tanto los pacientes recuperados como los fallecidos poseen un mismo patrón, en todas las provincias, si bien sus números de casos son distintos, manejan semejanzas en sus comportamientos.
