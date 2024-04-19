@@ -2,13 +2,13 @@
 title: "My Website"
 ---
 
-__Estudiante:__ Harlen Daniel Quirós Gómez
+**Estudiante:** Harlen Daniel Quirós Gómez
 
-__Carnet:__ 2022082503
+**Carnet:** 2022082503
 
-__Estudiante:__ Manuel de Jesús Calero Ríos
+**Estudiante:** Manuel de Jesús Calero Ríos
 
-__Carnet:__ 2022082503
+**Carnet:** 2022082503
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -19,7 +19,6 @@ library(plotly)
 library(tidyr)
 library(lubridate)
 
-setwd("C:/Users/manuc/Downloads")
 covid <- read_excel("CasosCOVID.xlsx", sheet = "1_GENERAL")
 covid_provincias <- read_excel("CasosCOVID.xlsx", sheet = "2_4 CANT_ACTIVOS")
 covid2 <- read_excel("CasosCOVID.xlsx", sheet = "2_5 CANT_NUEVOS")
@@ -32,12 +31,6 @@ covid_provincias <- covid_provincias %>%
   mutate(anio = year(fecha)) %>%
   filter( provincia != 'Otros')
 ```
-
-
-```{r}
-print(covid_provincias)
-```
-
 
 ```{r echo=FALSE}
 covid_no_acumulado <- covid %>%
@@ -58,6 +51,7 @@ ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
 ```
+
 Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
 
 ```{r}
@@ -77,6 +71,7 @@ ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(binwidt
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
 ```
+
 Hacer reseña entre las diferencias y que nunca hubo tantos hombres positivos como mujeres en un solo dia.
 
 ```{r}
@@ -94,7 +89,11 @@ covid_edad <- covid %>%
                cols = c('Menores fallecidos',  'Adultos fallecidos',	'Adultos mayores fallecidos')
 ) %>%
   filter(!is.na(value))
+<<<<<<< Updated upstream
 covid_edad
+=======
+
+>>>>>>> Stashed changes
 ```
 
 ```{r}
@@ -107,6 +106,7 @@ ggplot(covid_edad, aes(edad, value)) + geom_violin() +
   scale_y_continuous(breaks=seq( 0, max(covid_edad$value), by=500) ) +
   theme_classic()
 ```
+
 Hacer reseña hubieron muchos días con pocos casos en niños y adultos mayores, pero con los adultos tuvieron días con muchos más casos, estos fueron pocos días, por eso la gráfica se ve tan punteada.
 
 ```{r}
@@ -122,7 +122,11 @@ covid_muertos <- covid %>%
                cols = c('hombres fallecidos',  'mujeres fallecidas')
 ) %>%
   filter(!is.na(value), value>=0)
+<<<<<<< Updated upstream
 covid_muertos
+=======
+
+>>>>>>> Stashed changes
 ```
 
 ```{r}
@@ -135,6 +139,7 @@ ggplot(covid_muertos, aes(fallecidos, value)) + geom_boxplot() +
   scale_y_continuous(breaks=seq( 0, max(covid_edad$value), by=500) ) +
   theme_classic()
 ```
+
 En ambos gráficos se puede ver que hay días donde levemente hubo más hombres fallecidos que mujeres. Hubieron días que no hubo muertes. La caja de los hombres se observa un poco más larga, lo que quiere decir que la dispersión de cantidad de fallecidos por día es mayor en los hombres.
 
 ```{r}
@@ -143,11 +148,13 @@ ggplot(covid_provincias, aes(fecha, casos)) +
   facet_grid(provincia ~ anio, scales = "free_x")+
   theme_minimal()
 ```
+
 Hacer reseña de que san josé tiene muchos picos en más años comparados con las otras provincias, de igual manera en Alajuela
 
 ```{r}
 
 ```
+<<<<<<< Updated upstream
 
 # Gráfica multidimensional
 
@@ -173,3 +180,5 @@ barplot(height = datos_grafico_2021$casos_totales,
         ylab = "Casos totales de COVID")
 ```
 
+=======
+>>>>>>> Stashed changes
