@@ -52,6 +52,16 @@ covidFallecidos <- covidFallecidos %>%
   summarise(casos = sum(value)) %>%
   mutate(anio = year(fecha)) %>%
   filter( provincia != 'Otros', anio == 2021)
+
+covid_2021 <- covid2 %>%
+  filter(anio == 2021)
+
+covid_top5 <- covid_2021 %>%
+  filter(provincia %in% (covid_2021 %>%
+  group_by(provincia) %>%
+  summarise(total_casos = sum(casos)) %>%
+  arrange(desc(total_casos))%>%
+  slice(1:5))$provincia)
 ```
 # Gráficas unidimensionales 
 ```{r}
@@ -186,16 +196,6 @@ En la gráfica anterior se observa como la provincia con mayor cntidad de picos 
 # Gráfica multidimensional
 
 ```{r}
-covid_2021 <- covid2 %>%
-  filter(anio == 2021)
-
-covid_top5 <- covid_2021 %>%
-  filter(provincia %in% (covid_2021 %>%
-  group_by(provincia) %>%
-  summarise(total_casos = sum(casos)) %>%
-  arrange(desc(total_casos))%>%
-  slice(1:5))$provincia)
-
 p <- ggplot(covid_top5, aes(fecha, casos, color = provincia)) +
   geom_point() +
   gghighlight(max(casos)) +
