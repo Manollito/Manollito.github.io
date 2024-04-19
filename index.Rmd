@@ -44,32 +44,35 @@ covid_no_acumulado <- covid %>%
 ```
 
 ```{r}
-ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid, aes(nue_posi)) + geom_histogram(binwidth=100)+ 
   labs(
     x = "Cantidad de casos de covid", 
     title = "Casos nuevos covid") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
+ggplotly(p)
 ```
 
 Hacer reseña que por dicha no hubo muchos días con muchos casos nuevos de covid, la mayoría de días hubo menos de 500 casos.
 
 ```{r}
-ggplot(covid_no_acumulado, aes(muj_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid_no_acumulado, aes(muj_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
   labs(
     x = "Cantidad casos de covid: Mujeres", 
     title = "Casos nuevos de covid en mujeres") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
+ggplotly(p)
 ```
 
 ```{r}
-ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
+p <- ggplot(covid_no_acumulado, aes(homb_posi_no_acumulado)) + geom_histogram(binwidth=100)+ 
   labs(
     x = "Cantidad casos de covid: Hombres", 
     title = "Casos nuevos de covid en hombres") +
   scale_x_continuous(breaks=seq( 0, max(covid$nue_posi), by=500) ) +
   theme_classic()
+ggplotly(p)
 ```
 
 Hacer reseña entre las diferencias y que nunca hubo tantos hombres positivos como mujeres en un solo dia.
@@ -93,7 +96,7 @@ covid_edad <- covid %>%
 ```
 
 ```{r}
-ggplot(covid_edad, aes(edad, value)) + geom_violin() + 
+p <- ggplot(covid_edad, aes(edad, value)) + geom_violin() + 
   labs(
     x = "Categoria de edad", 
     y = "Cantidad de casos", 
@@ -101,6 +104,7 @@ ggplot(covid_edad, aes(edad, value)) + geom_violin() +
   ) +
   scale_y_continuous(breaks=seq( 0, max(covid_edad$value), by=500) ) +
   theme_classic()
+ggplotly(p)
 ```
 
 Hacer reseña hubieron muchos días con pocos casos en niños y adultos mayores, pero con los adultos tuvieron días con muchos más casos, estos fueron pocos días, por eso la gráfica se ve tan punteada.
@@ -121,7 +125,7 @@ covid_muertos <- covid %>%
 ```
 
 ```{r}
-ggplot(covid_muertos, aes(fallecidos, value)) + geom_boxplot() + 
+p <- ggplot(covid_muertos, aes(fallecidos, value)) + geom_boxplot() + 
   labs(
     x = "Sexo de los fallecidos", 
     y = "Cantidad de fallecidos", 
@@ -129,15 +133,17 @@ ggplot(covid_muertos, aes(fallecidos, value)) + geom_boxplot() +
   ) +
   scale_y_continuous(breaks=seq( 0, max(covid_edad$value), by=500) ) +
   theme_classic()
+ggplotly(p)
 ```
 
 En ambos gráficos se puede ver que hay días donde levemente hubo más hombres fallecidos que mujeres. Hubieron días que no hubo muertes. La caja de los hombres se observa un poco más larga, lo que quiere decir que la dispersión de cantidad de fallecidos por día es mayor en los hombres.
 
 ```{r}
-ggplot(covid_provincias, aes(fecha, casos)) + 
+p <- ggplot(covid_provincias, aes(fecha, casos)) + 
   geom_line() + 
   facet_grid(provincia ~ anio, scales = "free_x")+
   theme_minimal()
+ggplotly(p)
 ```
 
 Hacer reseña de que san josé tiene muchos picos en más años comparados con las otras provincias, de igual manera en Alajuela
@@ -145,7 +151,6 @@ Hacer reseña de que san josé tiene muchos picos en más años comparados con l
 ```{r}
 
 ```
-<<<<<<< Updated upstream
 
 # Gráfica multidimensional
 
